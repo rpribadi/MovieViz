@@ -1,62 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        * {
-            font-family: "Helvetica Neue", Helvetica, sans-serif;
-        }
-        svg {
-            display: block;
-            width: 90%;
-            height: 400px;
-            border: 1px solid #999;
-            margin-bottom: 15px;
-        }
-        li {
-            margin-bottom: 20px;
-        }
-
-		.axis path,
-		.axis line {
-		  fill: none;
-		  stroke: #000;
-		  shape-rendering: crispEdges;
-		}
-		
-		.line {
-		  fill: none;
-		  stroke: steelblue;
-		  stroke-width: 2px;
-		}
-		
-		 .chart-container {
-            display: block;
-            width: 100%;
-		 }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
 </head>
 <body>
     <a href='/index.html'>Back to Index</a>
     <h1>Movie Genres</h1>
     <ol>
         <li>
-            most and least seeded and downloaded movie genre (to include a paragraph describing the caveats on seeder and leecher definition)
-start from torrent table, get movie_id and match to movie table to get movie genre
+            <p>
+	            most and least seeded and downloaded movie genre 
+	            (to include a paragraph describing the caveats on seeder and 
+	            leecher definition) start from torrent table, get 
+	            movie_id and match to movie table to get movie genre
+            </p>
+			<svg id='chart-01'></svg>
+        </li>
+        <li>
+            <p>
+                most and least produced movie genre
+                based on movies produced in the whole year
+            </p>
 <pre>
 SELECT genre, COUNT(genre) FROM movie_genre
 GROUP BY genre 
 </pre>
-
-<svg id='chart-01'></svg>
-
+            <svg id='chart-02'></svg>
         </li>
         <li>
-            most and least produced movie genre
-            based on movies produced in the whole year
-<svg id='chart-02'></svg>
-        </li>
-        <li>
-            which movie genre has the most oscar nominations and wins in the latest oscars event
+            <p>
+                which movie genre has the most oscar nominations and 
+                wins in the latest oscars event
+            </p>
 <pre>
 SELECT genre, COUNT(genre)
 FROM movie_genre
@@ -66,14 +41,15 @@ WHERE movie_id IN (
 	)
 GROUP BY genre
 </pre>
-<svg id='chart-03'></svg>
+            <svg id='chart-03'></svg>
+
 <pre>
 SELECT category, genre, COUNT(genre)
 FROM movie_genre, oscar_movie_award
 WHERE  movie_genre.movie_id = oscar_movie_award.movie_id
 GROUP BY  category, genre
 </pre>
-<div id='chart-03b' class='chart-container'></div>
+            <div id='chart-03b' class='chart-container'></div>
 
         </li>
     <ol>

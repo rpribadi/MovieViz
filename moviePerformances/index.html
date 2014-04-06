@@ -6,6 +6,10 @@
         svg {
             height: 600px;
         }
+        
+        svg .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -82,6 +86,51 @@ WHERE id IN (
 </pre>
             <svg id='chart-05'></svg>
         </li>
+        <li>
+            <p>
+                oscar nominees budget in global top 100 
+            </p>
+<pre>
+SELECT 
+    title, 
+    budget_usd, 
+    (
+        CASE 
+	        WHEN id IN (
+	            SELECT DISTINCT(movie_id) FROM oscar_movie_award
+	        ) 
+	        THEN 1 ELSE 0
+        END
+    ) AS is_oscar
+FROM movie
+ORDER BY budget_usd DESC
+LIMIT 100
+</pre>
+            <svg id='chart-06'></svg>
+        </li>
+        <li>
+            <p>
+                oscar nominees revenue in global top 100 
+            </p>
+<pre>
+SELECT 
+    title, 
+    (latest_gross_usd - budget_usd) AS revenue, 
+    (
+        CASE 
+            WHEN id IN (
+                SELECT DISTINCT(movie_id) FROM oscar_movie_award
+            ) 
+            THEN 1 ELSE 0
+        END
+    ) AS is_oscar
+FROM movie
+WHERE latest_gross_usd IS NOT NULL 
+ORDER BY revenue DESC
+LIMIT 100
+</pre>
+            <svg id='chart-07'></svg>
+        </li>
     <ol>
     
     <script src='../libs/d3.min.js'></script>
@@ -91,6 +140,8 @@ WHERE id IN (
     <script src='js/chart03.js'></script>
     <script src='js/chart04.js'></script>
     <script src='js/chart05.js'></script>
+    <script src='js/chart06.js'></script>
+    <script src='js/chart07.js'></script>
 
     <script>
         $( document ).ready( function() {
@@ -99,6 +150,8 @@ WHERE id IN (
             var chart03 = new Chart03("#chart-03", "data/03.tsv");
             var chart04 = new Chart04("#chart-04", "data/04.tsv");
             var chart05 = new Chart05("#chart-05", "data/05.tsv");
+            var chart06 = new Chart06("#chart-06", "data/06.tsv");
+            var chart07 = new Chart07("#chart-07", "data/07.tsv");
         });
     </script>
 </body>

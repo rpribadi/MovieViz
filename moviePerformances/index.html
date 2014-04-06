@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <style>
+        svg {
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <a href='/index.html'>Back to Index</a>
+    <h1>Movie Performances</h1>
+    <ol>
+        <li>
+            <p>
+                oscar nominees budget
+            </p>
+<pre>
+SELECT title, budget_usd 
+FROM movie
+WHERE id IN ( 
+    SELECT DISTINCT(movie_id) 
+    FROM oscar_movie_award
+)
+</pre>
+			<svg id='chart-01'></svg>
+        </li>
+        <li>
+            <p>
+                oscar nominees opening week gross
+            </p>
+<pre>
+SELECT title, opening_week_gross_usd
+FROM movie
+WHERE id IN ( 
+    SELECT DISTINCT(movie_id) 
+    FROM oscar_movie_award
+)
+</pre>
+            <svg id='chart-02'></svg>
+        </li>
+        <li>
+            <p>
+                oscar nominees latest gross
+            </p>
+<pre>
+SELECT title, latest_gross_usd
+FROM movie
+WHERE id IN ( 
+    SELECT DISTINCT(movie_id) 
+    FROM oscar_movie_award
+)
+</pre>
+            <svg id='chart-03'></svg>
+        </li>
+        <li>
+            <p>
+                oscar nominees revenue
+            </p>
+<pre>
+SELECT title, (latest_gross_usd - budget_usd) AS revenue
+FROM movie
+WHERE id IN ( 
+    SELECT DISTINCT(movie_id) 
+    FROM oscar_movie_award
+)
+</pre>
+            <svg id='chart-04'></svg>
+        </li>
+        <li>
+            <p>
+                oscar nominees revenue by budget percentage
+            </p>
+<pre>
+SELECT title, ( (latest_gross_usd - budget_usd) * 100 / budget_usd ) AS percentage 
+FROM movie
+WHERE id IN ( 
+    SELECT DISTINCT(movie_id) 
+    FROM oscar_movie_award
+)
+</pre>
+            <svg id='chart-05'></svg>
+        </li>
+    <ol>
+    
+    <script src='../libs/d3.min.js'></script>
+    <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='js/chart01.js'></script>
+    <script src='js/chart02.js'></script>
+    <script src='js/chart03.js'></script>
+    <script src='js/chart04.js'></script>
+    <script src='js/chart05.js'></script>
+
+    <script>
+        $( document ).ready( function() {
+            var chart01 = new Chart01("#chart-01", "data/01.tsv");
+            var chart02 = new Chart02("#chart-02", "data/02.tsv");
+            var chart03 = new Chart03("#chart-03", "data/03.tsv");
+            var chart04 = new Chart04("#chart-04", "data/04.tsv");
+            var chart05 = new Chart05("#chart-05", "data/05.tsv");
+        });
+    </script>
+</body>
+</html> 

@@ -54,7 +54,8 @@
 				    .orient("left");
 			
 				var line = d3.svg.line()
-				    .x(function(d) { return x( d.genre ); })
+					.interpolate("monotone")
+					.x(function(d) { return x( d.genre ); })
 				    .y(function(d) { return y( d.total ); });
 	
 				var chart = svg.append("g")

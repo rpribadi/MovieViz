@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        svg {
+            display: block;
+            width: 90%;
+            height: 400px;
+            border: 1px solid #999;
+        }
+        li {
+            margin-bottom: 20px;
+        }
+
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		
+		.line {
+		  fill: none;
+		  stroke: steelblue;
+		  stroke-width: 1.5px;
+		}
+		
+		 .chart-container {
+            display: block;
+            width: 100%;
+		 }
+    </style>
+</head>
+<body>
+    <a href='/index.html'>Back to Index</a>
+    <h1>Movie Genres</h1>
+    <ol>
+        <li>
+            most and least seeded and downloaded movie genre (to include a paragraph describing the caveats on seeder and leecher definition)
+start from torrent table, get movie_id and match to movie table to get movie genre
+<pre>
+SELECT genre, COUNT(genre) FROM movie_genre
+GROUP BY genre 
+</pre>
+
+<svg id='chart-01'></svg>
+
+        </li>
+        <li>
+            most and least produced movie genre
+            based on movies produced in the whole year
+<svg id='chart-02'></svg>
+        </li>
+        <li>
+            which movie genre has the most oscar nominations and wins in the latest oscars event
+<pre>
+SELECT genre, COUNT(genre)
+FROM movie_genre
+WHERE movie_id IN ( 
+		SELECT DISTINCT(movie_id)
+		FROM oscar_movie_award
+	)
+GROUP BY genre
+</pre>
+<svg id='chart-03'></svg>
+<pre>
+SELECT category, genre, COUNT(genre)
+FROM movie_genre, oscar_movie_award
+WHERE  movie_genre.movie_id = oscar_movie_award.movie_id
+GROUP BY  category, genre
+</pre>
+<div id='chart-03b' class='chart-container'></div>
+
+        </li>
+    <ol>
+    
+    <script src='../libs/d3.min.js'></script>
+    <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='js/chart02.js'></script>
+    <script src='js/chart03.js'></script>
+    <script src='js/chart03b.js'></script>
+
+    <script>
+        $( document ).ready( function() {
+            var chart02 = new Chart02("#chart-02", "data/02.tsv");
+            var chart03 = new Chart03("#chart-03", "data/03.tsv");
+            var chart03b = new Chart03B("#chart-03b", "data/03b.tsv");
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <style>
+        svg {
+            height: 700px;
+        }
+        .line {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href='/index.html'>Back to Index</a>
+    <h1>Movie Oscar Torrent</h1>
+    <ol>
+        <li>
+            <p>
+	            most and least seeded and downloaded movie genre 
+	            (to include a paragraph describing the caveats on seeder and 
+	            leecher definition) start from torrent table, get 
+	            movie_id and match to movie table to get movie genre
+            </p>
+<pre>
+SELECT movie_id,
+       movie.title,
+       monitor_date,
+       SUM(seeder) AS total_seeder,
+       SUM(leecher) AS total_leecher
+FROM torrent INNER JOIN movie ON movie.id = torrent.movie_id
+WHERE movie_id IN ( 
+        SELECT movie_id from oscar_movie_award
+    )
+GROUP BY movie_id, monitor_date
+ORDER BY movie.title ASC, monitor_date ASC
+</pre>
+			<svg id='chart-01'></svg>
+        </li>
+    <ol>
+    
+    <script src='../libs/d3.min.js'></script>
+    <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='js/chart01.js'></script>
+
+    <script>
+        $( document ).ready( function() {
+            var chart01 = new Chart01("#chart-01", "data/01.tsv");
+        });
+    </script>
+</body>
+</html> 

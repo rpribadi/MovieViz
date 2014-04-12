@@ -28,6 +28,8 @@
 		    .scale(y)
 		    .orient("left");
 	
+		var colorScale =  d3.scale.category10();
+		
 		var line = d3.svg.line()
 			.interpolate("monotone")
 		    .x(function(d) { return x( d.date ); })
@@ -95,8 +97,7 @@
 			  .style("text-anchor", "end")
 			  .text("Total");
 
-			var colorScale =  d3.scale.category20()
-		    					.domain( Object.keys( data) );
+			colorScale.domain( Object.keys( data ) );
 
 			var index = 0;
 			var keys = Object.keys( data );

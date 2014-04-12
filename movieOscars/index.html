@@ -4,9 +4,20 @@
     <link rel="stylesheet" type="text/css" href="/style/style.css" />
     <style>
         svg {
-            height: 700px;
+            height: 650px;
         }
         .line {
+            cursor: pointer;
+        }
+        circle.infobox {
+            stroke: black;
+            stroke-width: 3px;
+            fill: white;
+        }
+        rect.infobox {
+            opacity: 0.5
+        }
+        g.legend {
             cursor: pointer;
         }
     </style>
@@ -35,7 +46,10 @@ WHERE movie_id IN (
 GROUP BY movie_id, monitor_date
 ORDER BY movie.title ASC, monitor_date ASC
 </pre>
-			<svg id='chart-01'></svg>
+            <h3>Most Leeched</h3>
+			<svg id='chart-01-leecher' class='leecher'></svg>
+            <h3>Most Seeded</h3>
+            <svg id='chart-01-seeder' class='seeder'></svg>
         </li>
     <ol>
     
@@ -45,7 +59,8 @@ ORDER BY movie.title ASC, monitor_date ASC
 
     <script>
         $( document ).ready( function() {
-            var chart01 = new Chart01("#chart-01", "data/01.tsv");
+            var chart01Leecher = new Chart01("#chart-01-leecher", "data/01.tsv", "leecher");
+            var chart01Seeder = new Chart01("#chart-01-seeder", "data/01.tsv", "seeder");
         });
     </script>
 </body>

@@ -2,13 +2,13 @@
 
 	"use strict";
 
-	var Chart01 = function(element, filename) {
+	var Chart01 = function(element, filename, valueKey) {
 		var svg = d3.select(element);
 		var padding = {
 			top: 30,
-			bottom: 100,
-			left: 120,
-			right: 100,
+			bottom: 80,
+			left: 75,
+			right: 300,
 		};
 		var width = $( element ).width() - padding.left - padding.right;
 		var height = $( element ).height() - padding.top - padding.bottom;
@@ -31,7 +31,7 @@
 		var line = d3.svg.line()
 			.interpolate("monotone")
 		    .x(function(d) { return x( d.date ); })
-		    .y(function(d) { return y( d.leecher); });
+		    .y(function(d) { return y( d[valueKey]); });
 
 		var chart = svg.append("g")
 	    	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
@@ -44,7 +44,7 @@
 				};
 				
 				item.leecher = parseInt(item.leecher);
-				item.leecher= parseInt(item.leecher);
+				item.seeder = parseInt(item.seeder);
 				
 				data[ item.title ].push( item );
 			});
@@ -54,11 +54,11 @@
 			xAxisDomain.sort();
 
 			var yAxisDomain= d3.extent( rawData, function( item ){ 
-				if( item.leecher > item.leecher ) {
+				if( item.leecher > item.seeder ) {
 					return item.leecher;
 				}
 				else {
-					return item.leecher;
+					return item.seeder;
 				}
 			});
 			yAxisDomain[0] = 0;
@@ -98,6 +98,37 @@
 			var colorScale =  d3.scale.category20()
 		    					.domain( Object.keys( data) );
 
+			var index = 0;
+			var keys = Object.keys( data );
+			var legend = chart.append("g")
+				.attr("class", "legend-container");
+
+			var g = legend.selectAll("g")
+				.data(keys)
+				.enter()
+					.append("g")
+						.attr("id", function(key) { return valueKey + "-legend-" + data[key][0].id; })
+						.attr("class", "legend")
+						.on("mouseover", function(item) {
+							mouseover(data[item][0].id, data[item]);
+						})
+						.on("mouseout", function(item) {
+							mouseout(data[item][0].id);
+						});
+			g.append("text")
+				.text(function(key) { return key; })
+				.attr("fill", "#000")
+				.attr("x", $( element ).width()-350)
+				.attr("y", function(key, index) { return 10 + (index * 19); });
+
+			g.append("rect")
+				.attr("width", "15")
+				.attr("height", "15")
+				.attr("id", function(key){ return valueKey + "-rect-" + data[key][0].id; })
+				.attr("fill", function( key ) { return colorScale( key ); })
+				.attr("x", -20 + $( element ).width()-350)
+				.attr("y", function(key, index) { return -4 + (index * 19); } );
+			
 			for( var key in data ) {
 				chart.append("g")
 						.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
@@ -105,31 +136,114 @@
 						.datum( data[key] )
 						.attr("class", "line")
 						.attr("d", line)
-						.attr("id", data[ key ][0].id)
+						.attr("id", valueKey + "-" + data[ key ][0].id)
 						.style("stroke", colorScale( key ) )
 						.on("mouseover", function( item ) { 
-							var last = item[ item.length - 1];
-							
-							console.log(last, x(last.date), y(last.leecher));
-							svg.append("text")
-								.text(last.title)
-								.attr("class", "infobox")
-								.attr("transform", "translate(" + x(last.date) + ", " + y(last.leecher) + ")")
-								
+							mouseover(item[0].id, item)
 
-							$("path.line").css("stroke-width", "0.15")
-							$("#"+item[0].id).css("stroke-width", "5")
 						})
                         .on("mouseout", function( item ) { 
-							$("path.line").css("stroke-width", "2")
-							svg.select(".infobox")
-									.remove();
-							$("#"+item[0].id).css("stroke-width", "2")
+                        	mouseout(item[0].id);
                     	})
-				console.log(colorScale( key ));
+
+            	console.log(colorScale( key ));
+
 			}
 
+			function mouseover(id, data) {
+				
+				$("svg." + valueKey + " path.line").css("opacity", "0.4").css("stroke-width", "1")
+				$("#"+valueKey+"-"+id).css("stroke-width", "5").css("opacity", "1")
+
+				chart.append("g")
+				.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
+				.selectAll("circle")
+				   .data( data )
+				   .enter()
+				   .append("circle")
+				   .attr("class", "infobox")
+				   .attr("cx", function(d) {
+				   		return x(d.date);
+				   })
+				   .attr("cy", function(d) {
+				   		return y(d[valueKey]);
+				   })
+				   .attr("r", 4);
+
+				chart.append("g")
+					.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
+				.selectAll("text")
+				   .data( data )
+				   .enter()
+				   .append("rect")
+				   	   .attr("class", "infobox")
+					   .attr("fill", "#CDEEEE")
+					   .attr("width", function(d) { 
+						   var text = "" + d[valueKey];
+						   return text.length * 7;
+					   })
+					   .attr("height", 15)
+					   .attr("x", function(d) {
+					   		return x(d.date) - 	12;
+					   })
+					   .attr("y", function(d) {
+					   		return y(d[valueKey]) - 16;
+					   })
+				   .append("text")
+					   .attr("class", "infobox")
+					   .text(function(d) {
+					   		return d[valueKey];
+					   })
+					   .attr("x", function(d) {
+					   		return x(d.date) - 	10;
+					   })
+					   .attr("y", function(d) {
+					   		return y(d[valueKey]) - 5;
+					   })
+					   .attr("font-family", "sans-serif")
+					   .attr("font-size", "11px")
+					   .attr("fill", "black");		
+
+				chart.append("g")
+					.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
+				.selectAll("text")
+				   .data( data )
+				   .enter()
+				   .append("text")
+				   .attr("class", "infobox")
+				   .text(function(d) {
+				   		return d[valueKey];
+				   })
+				   .attr("x", function(d) {
+				   		return x(d.date) - 	10;
+				   })
+				   .attr("y", function(d) {
+				   		return y(d[valueKey]) - 5;
+				   })
+				   .attr("font-family", "sans-serif")
+				   .attr("font-size", "11px")
+				   .attr("fill", "red");				
+
+				$("svg." + valueKey + " g.legend").css("opacity", "0.2");
+				$("#" + valueKey + "-legend-" + id).css("opacity", "1");
+				$("#" + valueKey + "-rect-" + id).css("stroke", "#333").css("stroke-width", "2px");
+				
+				console.log("ID", "#" + valueKey + "-legend-" + id)
+			
+			}
+
+			function mouseout(id) {
+				$("svg." + valueKey + " path.line").css("stroke-width", "2").css("opacity", "1")
+				chart.selectAll(".infobox")
+						.remove();
+				$("#"+valueKey+"-"+id).css("stroke-width", "2");
+				
+				$("g.legend").css("opacity", "1");
+				$("#" + valueKey + "-rect-" + id).css("stroke", "none");
+
+			}
 		});
+		
 
 	};
 

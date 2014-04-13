@@ -36,9 +36,16 @@
             </p>
 <pre>
 SELECT date, COUNT(date)
-FROM movie_release_date INNER JOIN movie ON movie.id = movie_release_date.movie
-WHERE movie_release_date.country = "USA" AND date >= "2013-01-01" AND date <= "2013-12-31"
+FROM (
+	SELECT movie, date
+	FROM movie_release_date
+	WHERE movie_release_date.country = "USA" 
+		AND date >= "2013-01-01"
+	    AND date <= "2013-12-31"
+	GROUP BY movie, date
+) movie_release
 GROUP BY date
+ORDER BY date ASC
 </pre>
             <div style='position: relative;'>
             <div id='chart-01-infobox' class='infobox'></div>

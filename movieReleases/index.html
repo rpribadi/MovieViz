@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <style>
+        svg {
+            height: 600px;
+        }
+        
+        svg .hidden {
+            display: none;
+        }
+        .infobox {
+            width: 150px;
+            height: 40px;
+            border-radius: 5px;
+            border: 5px solid #999;
+            background-color: #CCC;
+            padding: 5px;
+            opacity: 0.8;
+            visibility: hidden;
+            position: absolute;
+        }
+        #chart-01 circle {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href='/index.html'>Back to Index</a>
+    <h1>Movie Releases</h1>
+    <ol>
+        <li>
+            <p>
+                Number of Movie Releases by Date
+            </p>
+<pre>
+SELECT date, COUNT(date)
+FROM movie_release_date INNER JOIN movie ON movie.id = movie_release_date.movie
+WHERE movie_release_date.country = "USA" AND date >= "2013-01-01" AND date <= "2013-12-31"
+GROUP BY date
+</pre>
+            <div style='position: relative;'>
+            <div id='chart-01-infobox' class='infobox'></div>
+			<svg id='chart-01'></svg>
+			</div>
+        </li>
+    <ol>
+    
+    <script src='../libs/d3.min.js'></script>
+    <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='js/chart01.js'></script>
+
+    <script>
+        $( document ).ready( function() {
+            var chart01 = new Chart01("#chart-01", "data/01.tsv");
+        });
+    </script>
+</body>
+</html> 

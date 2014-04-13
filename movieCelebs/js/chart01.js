@@ -14,7 +14,7 @@
 		var height = $( element ).height() - padding.top - padding.bottom;
 
 		var sizeScale = d3.scale.linear()
-			.range([0, 15]);
+			.range([0, 20]);
 
 		var colorScale =   d3.scale.log()
 	        .interpolate(d3.interpolateHsl)

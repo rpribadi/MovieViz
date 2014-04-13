@@ -122,13 +122,18 @@
 				   .attr("fill", function(d,i) { return colorScale(d.total); })
 				   .on("mouseover", function( item, i ) {
 					   console.log( item );
+					   var text = "<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + item.total+ "</strong>";
+						   
+					   if( item.date in oscarToDates ) {
+						   text += "<br/><br />OSCAR Movie(s): <strong>"+ oscarToDates[item.date].movie.length +"</strong><br />" + oscarToDates[item.date].movie.join("<br />")
+					   }
 					   $("#chart-01-infobox").css({
 							   	"display": "auto",
 							   	"visibility": "visible",
 								"left": x( new Date( Date.parse(item.date) ) ) + 60,
 								"top": y(item.total)
-					   		})
-							.html("<strong>" + item.date + "</strong><br />Total: " + item.total);
+				   		})
+						.html(text);
 					   
 					   $(element + "-" + item.date).css("stroke", "#111").css("stroke-width", 3)
 				   })
@@ -198,8 +203,8 @@
 								   	"visibility": "visible",
 									"left": x( new Date( Date.parse(item.date) ) ) + 60,
 									"top": y(80)
-						   		})
-								.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />OSCAR Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
+					   		})
+							.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />OSCAR Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
 						   
 						   $(element + "-" + item.date).css("stroke", "red").css("stroke-width", 5)
 						   $(element + "-" + item.date).attr("r", 15)

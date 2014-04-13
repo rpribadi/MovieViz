@@ -12,7 +12,7 @@
         }
         .infobox {
             width: 150px;
-            height: 40px;
+            min-height: 40px;
             border-radius: 5px;
             border: 5px solid #999;
             background-color: #CCC;
@@ -23,6 +23,14 @@
         }
         #chart-01 circle {
             cursor: pointer;
+        }
+        #chart-01 rect.oscar {
+            cursor: pointer;
+            stroke: none;
+        }
+        #chart-01 rect.oscar:hover {
+            stroke-width: 2px;
+            stroke: black;
         }
     </style>
 </head>

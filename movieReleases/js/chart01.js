@@ -58,10 +58,14 @@
 
 		var chart = svg.append("g")
 	    	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-		
+
+
+		var movieToDates = {};
+		var oscarToDates = {};
 		d3.tsv(filename, function( error, data ) {
 			data.forEach( function( item, i ) {
 				item.total = parseInt(item.total);
+				movieToDates[ item.date ] = item.total;
 			});
 			
 			var maxTotal = d3.max(data, function(d) { return d.total; });
@@ -126,13 +130,95 @@
 					   		})
 							.html("<strong>" + item.date + "</strong><br />Total: " + item.total);
 					   
-					   $(element + "-" + item.date).css("stroke", "#666").css("stroke-width", 2)
+					   $(element + "-" + item.date).css("stroke", "#111").css("stroke-width", 3)
 				   })
 				   .on("mouseout", function( item ) {
 					   $("#chart-01-infobox").css("display", "none");
-					   $(element + "-" + item.date).css("stroke", "none")
+					   
+					   if( item.date in oscarToDates === false ) {
+						   $(element + "-" + item.date).css("stroke", "none")
+					   }
 				   });
 
+			
+			d3.tsv("data/01-oscar.tsv", function( error, rawData ) {
+				var data = [];
+				var cleaned = {};
+				var rectWidth = 5;
+				var rectHeight = 20;
+				rawData.forEach( function( item, i ) {
+					item.total = parseInt(item.total);
+					if( cleaned[ item.date ] === undefined ) {
+						cleaned[ item.date ] = {
+								date: item.date,
+								total: 0,
+								movie: []
+						}
+						
+					}
+					cleaned[ item.date ].total += 1;
+					cleaned[ item.date ].movie.push( "&bull; " + item.title )
+				});
+				
+				oscarToDates = cleaned;
+				for( var key in cleaned ) {
+					data.push( cleaned[key] );
+					$(element + "-" + cleaned[key].date).css("stroke", "#111").css("stroke-width", 3)
+				}
+
+				chart.append("text")
+				.text("OSCARS")
+				.attr("y", y(87))
+				.attr("x", -30)
+
+				chart.append("g")
+					.attr("transform", "translate(" + barWidth + ",0)")
+					.selectAll("rect")
+					   .data(data)
+					   .enter()
+					   .append("rect")
+					   .attr("id", function(d, i) {
+						   	
+					   		return element.replace("#", "") + "-" + d.date;
+					   })
+					   .attr("class", function(d) { return "oscar " + d.date; })
+					   .attr("width", rectWidth)
+					   .attr("height", rectHeight)
+					   .attr("x", function(d, i) {
+					   		return x( new Date( Date.parse(d.date) ) ) - ( rectWidth / 2);
+					   })
+					   .attr("y", function(d) {
+					   		return y(90);
+					   })
+					   .attr("r", function(d) {return 10})
+					   .attr("fill", function(d,i) { return colorScale(d.total); })
+					   .on("mouseover", function( item, i ) {
+						   $("#chart-01-infobox").css({
+								   	"display": "auto",
+								   	"visibility": "visible",
+									"left": x( new Date( Date.parse(item.date) ) ) + 60,
+									"top": y(80)
+						   		})
+								.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />OSCAR Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
+						   
+						   $(element + "-" + item.date).css("stroke", "red").css("stroke-width", 5)
+						   $(element + "-" + item.date).attr("r", 15)
+						   $("rect.oscar").css("opacity", 0.4);
+						   $("rect.oscar." + item.date ).css("opacity", 1);
+					   })
+					   .on("mouseout", function( item ) {
+						   $("rect.oscar").css("opacity", 1);
+						   $("#chart-01-infobox").css("display", "none");
+						   if( item.date in oscarToDates === false) {
+							   $(element + "-" + item.date).css("stroke", "none")
+						   }
+						   else {
+							   $(element + "-" + item.date).css("stroke", "#111").css("stroke-width", 3)
+						   }
+						   $(element + "-" + item.date).attr("r", sizeScale(movieToDates[ item.date ]))
+					   });
+				
+			})			
 		});
 
 	};

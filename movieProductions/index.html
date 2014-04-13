@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/style/style.css" />
+    <style>
+        svg {
+            height: 600px;
+        }
+        
+        svg .hidden {
+            display: none;
+        }
+
+        #ce span {
+            display: none;
+        }
+
+        #ce {
+			width: 107px;
+			height: 55px;
+			display: block;
+			position: absolute;
+			bottom: 15px;
+			left: 20px;
+			background: url(ce.png);
+        }
+    </style>
+</head>
+<body>
+
+  <div id="container"></div>
+
+
+<script src='../libs/d3.min.js'></script>
+<script src='../libs/jquery-2.1.0.min.js'></script>
+<script type="text/javascript" src="third-party/Detector.js"></script>
+<script type="text/javascript" src="third-party/three.min.js"></script>
+<script type="text/javascript" src="globe.js"></script>
+<script type="text/javascript">
+$( document ).ready( function() {
+
+    if(!Detector.webgl){
+        Detector.addGetWebGLMessage();
+    } else {
+
+      var container = document.getElementById('container');
+      var globe = new DAT.Globe(container);
+
+    
+		d3.tsv("data/01.tsv", function( error, rawData ) {
+
+			var data = [];
+			rawData.forEach( function( item ) {
+				data.push(item.latitude);
+				data.push(item.longitude);
+                data.push(item.total);
+            });
+            globe.addData(data, {format: 'magnitude', name: "Movie Production", animated: false});
+            globe.createPoints();
+            globe.animate();
+            document.body.style.backgroundImage = 'none'; // remove loading
+
+        });
+    }
+});
+</script>
+</body>
+</html>

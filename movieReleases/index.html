@@ -21,14 +21,14 @@
             visibility: hidden;
             position: absolute;
         }
-        #chart-01 circle {
+        #chart-01 circle, #chart-02 circle, #chart-03 circle {
             cursor: pointer;
         }
-        #chart-01 rect.oscar {
+        #chart-01 rect.oscar, #chart-02 rect.gross, #chart-03 rect.budget {
             cursor: pointer;
             stroke: none;
         }
-        #chart-01 rect.oscar:hover {
+        #chart-01 rect.oscar:hover, #chart-02 rect.gross:hover, #chart-03 rect.budget:hover {
             stroke-width: 2px;
             stroke: black;
         }
@@ -40,7 +40,7 @@
     <ol>
         <li>
             <p>
-                Number of Movie Releases by Date
+                Number of Movie Releases by Date VS OSCARS
             </p>
 <pre>
 SELECT date, COUNT(date)
@@ -55,20 +55,109 @@ FROM (
 GROUP BY date
 ORDER BY date ASC
 </pre>
+<pre>
+SELECT movie, title, date
+FROM movie_release_date INNER JOIN movie ON movie.id = movie_release_date.movie
+WHERE movie_release_date.country = "USA" 
+    AND date >= "2013-01-01"
+    AND date <= "2013-12-31"
+    AND movie IN ( SELECT DISTINCT(movie_id) FROM oscar_movie_award )
+GROUP BY movie, date
+ORDER BY date ASC
+</pre>
             <div style='position: relative;'>
             <div id='chart-01-infobox' class='infobox'></div>
 			<svg id='chart-01'></svg>
 			</div>
         </li>
+        <li>
+            <p>
+                Number of Movie Releases by Date VS Top 100 Opening Week Gross
+            </p>
+<pre>
+SELECT date, COUNT(date)
+FROM (
+    SELECT movie, date
+    FROM movie_release_date
+    WHERE movie_release_date.country = "USA" 
+        AND date >= "2013-01-01"
+        AND date <= "2013-12-31"
+    GROUP BY movie, date
+) movie_release
+GROUP BY date
+ORDER BY date ASC
+</pre>
+<pre>
+SELECT movie, title, date
+FROM movie_release_date INNER JOIN movie ON movie.id = movie_release_date.movie
+WHERE movie_release_date.country = "USA" 
+    AND date >= "2013-01-01"
+    AND date <= "2013-12-31"
+    AND movie IN ( 
+		SELECT id
+		FROM movie
+		WHERE opening_week_gross_usd IS NOT NULL 
+		ORDER BY opening_week_gross_usd DESC
+		LIMIT 100
+    )
+GROUP BY movie, date
+ORDER BY date ASC
+</pre>
+            <div style='position: relative;'>
+            <div id='chart-02-infobox' class='infobox'></div>
+            <svg id='chart-02'></svg>
+            </div>
+        </li>    
+        <li>
+            <p>
+                Number of Movie Releases by Date VS Top 100 Opening Week Gross
+            </p>
+<pre>
+SELECT date, COUNT(date)
+FROM (
+    SELECT movie, date
+    FROM movie_release_date
+    WHERE movie_release_date.country = "USA" 
+        AND date >= "2013-01-01"
+        AND date <= "2013-12-31"
+    GROUP BY movie, date
+) movie_release
+GROUP BY date
+ORDER BY date ASC
+</pre>
+<pre>
+SELECT movie, title, date
+FROM movie_release_date INNER JOIN movie ON movie.id = movie_release_date.movie
+WHERE movie_release_date.country = "USA" 
+    AND date >= "2013-01-01"
+    AND date <= "2013-12-31"
+    AND movie IN ( 
+		SELECT id
+		FROM movie
+		ORDER BY budget_usd DESC
+		LIMIT 100
+	)
+GROUP BY movie, date
+ORDER BY date ASC
+</pre>
+            <div style='position: relative;'>
+            <div id='chart-03-infobox' class='infobox'></div>
+            <svg id='chart-03'></svg>
+            </div>
+        </li>    
     <ol>
     
     <script src='../libs/d3.min.js'></script>
     <script src='../libs/jquery-2.1.0.min.js'></script>
     <script src='js/chart01.js'></script>
+    <script src='js/chart02.js'></script>
+    <script src='js/chart03.js'></script>
 
     <script>
         $( document ).ready( function() {
-            var chart01 = new Chart01("#chart-01", "data/01.tsv");
+            var chart01 = new Chart01("#chart-01", "data/01.tsv", "data/01-oscar.tsv");
+            var chart02 = new Chart02("#chart-02", "data/02.tsv", "data/02-gross.tsv");
+            var chart03 = new Chart03("#chart-03", "data/03.tsv", "data/03-budget.tsv");
         });
     </script>
 </body>

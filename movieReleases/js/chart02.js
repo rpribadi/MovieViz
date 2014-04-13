@@ -2,7 +2,7 @@
 
 	"use strict";
 
-	var Chart01 = function(element, filename1, filename2) {
+	var Chart02 = function(element, filename1, filename2) {
 		var svg = d3.select(element);
 		var padding = {
 			top: 50,
@@ -61,7 +61,7 @@
 
 
 		var movieToDates = {};
-		var oscarToDates = {};
+		var grossToDates = {};
 		d3.tsv(filename1, function( error, data ) {
 			data.forEach( function( item, i ) {
 				item.total = parseInt(item.total);
@@ -124,8 +124,8 @@
 					   console.log( item );
 					   var text = "<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + item.total+ "</strong>";
 						   
-					   if( item.date in oscarToDates ) {
-						   text += "<br/><br />OSCAR Movie(s): <strong>"+ oscarToDates[item.date].movie.length +"</strong><br />" + oscarToDates[item.date].movie.join("<br />")
+					   if( item.date in grossToDates ) {
+						   text += "<br/><br />Top Gross Movie(s): <strong>"+ grossToDates[item.date].movie.length +"</strong><br />" + grossToDates[item.date].movie.join("<br />")
 					   }
 					   $(element + "-infobox").css({
 							   	"display": "auto",
@@ -140,7 +140,7 @@
 				   .on("mouseout", function( item ) {
 					   $(element + "-infobox").css("display", "none");
 					   
-					   if( item.date in oscarToDates === false ) {
+					   if( item.date in grossToDates === false ) {
 						   $(element + "-" + item.date).css("stroke", "none")
 					   }
 				   });
@@ -165,14 +165,14 @@
 					cleaned[ item.date ].movie.push( "&bull; " + item.title )
 				});
 				
-				oscarToDates = cleaned;
+				grossToDates = cleaned;
 				for( var key in cleaned ) {
 					data.push( cleaned[key] );
 					$(element + "-" + cleaned[key].date).css("stroke", "#111").css("stroke-width", 3)
 				}
 
 				chart.append("text")
-				.text("OSCARS")
+				.text("TOP 100")
 				.attr("y", y(87))
 				.attr("x", -30)
 
@@ -186,7 +186,7 @@
 						   	
 					   		return element.replace("#", "") + "-" + d.date;
 					   })
-					   .attr("class", function(d) { return "oscar " + d.date; })
+					   .attr("class", function(d) { return "gross " + d.date; })
 					   .attr("width", rectWidth)
 					   .attr("height", rectHeight)
 					   .attr("x", function(d, i) {
@@ -204,17 +204,17 @@
 									"left": x( new Date( Date.parse(item.date) ) ) + 60,
 									"top": y(80)
 					   		})
-							.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />OSCAR Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
+							.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />Top Gross Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
 						   
 						   $(element + "-" + item.date).css("stroke", "red").css("stroke-width", 5)
 						   $(element + "-" + item.date).attr("r", 15)
-						   $("rect.oscar").css("opacity", 0.4);
-						   $("rect.oscar." + item.date ).css("opacity", 1);
+						   $("rect.gross").css("opacity", 0.4);
+						   $("rect.gross." + item.date ).css("opacity", 1);
 					   })
 					   .on("mouseout", function( item ) {
-						   $("rect.oscar").css("opacity", 1);
+						   $("rect.gross").css("opacity", 1);
 						   $(element + "-infobox").css("display", "none");
-						   if( item.date in oscarToDates === false) {
+						   if( item.date in grossToDates === false) {
 							   $(element + "-" + item.date).css("stroke", "none")
 						   }
 						   else {
@@ -228,6 +228,6 @@
 
 	};
 
-	window.Chart01 = Chart01;
+	window.Chart02 = Chart02;
 
 }(window, $, d3));

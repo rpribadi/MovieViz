@@ -21,6 +21,9 @@ DAT.Globe = function(container, opts) {
     c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
     return c;
   };
+  
+  var sizeFn = opts.sizeFn;
+
   var imgDir = opts.imgDir || '';
 
   var Shaders = {
@@ -174,7 +177,9 @@ DAT.Globe = function(container, opts) {
     console.log(opts.format);
     if (opts.format === 'magnitude') {
       step = 3;
-      colorFnWrapper = function(data, i) { return colorFn(data[i+2]); }
+      colorFnWrapper = function(data, i) { 
+    	  console.log(colorFn(data[i+2]), data[i+2]);
+    	  return colorFn(data[i+2]); }
     } else if (opts.format === 'legend') {
       step = 4;
       colorFnWrapper = function(data, i) { return colorFn(data[i+3]); }
@@ -206,8 +211,7 @@ DAT.Globe = function(container, opts) {
       lat = data[i];
       lng = data[i + 1];
       color = colorFnWrapper(data,i);
-      size = data[i + 2];
-      size = size;
+      size = sizeFn( data[i + 2] );
       addPoint(lat, lng, size, color, subgeo);
     }
     if (opts.animated) {
@@ -236,11 +240,11 @@ DAT.Globe = function(container, opts) {
             this._baseGeometry.morphTargets.push({'name': 'morphPadding'+i, vertices: this._baseGeometry.vertices});
           }
         }
-        this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
-              color: 0xffffff,
-              vertexColors: THREE.FaceColors,
-              morphTargets: true
-            }));
+//        this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
+//              color: 0xffffff,
+//              vertexColors: THREE.FaceColors,
+//              morphTargets: true
+//            }));
       }
       scene.add(this.points);
     }

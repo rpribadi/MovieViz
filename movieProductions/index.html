@@ -39,15 +39,32 @@
 <script type="text/javascript">
 $( document ).ready( function() {
 
-    if(!Detector.webgl){
-        Detector.addGetWebGLMessage();
-    } else {
+if(!Detector.webgl){
+    Detector.addGetWebGLMessage();
+} else {
+    
+	var colorFn = function( value ) {
+        var scale = d3.scale.linear()
+            .interpolate(d3.interpolateHsl)
+            .domain([0, 500])
+            .range(["hsl(176, 100%, 50%)","hsl(340, 100%, 50%)"]);
 
-      var container = document.getElementById('container');
-      var globe = new DAT.Globe(container);
+        return new THREE.Color( scale( value ) );
+	}
+
+    var sizeFn = d3.scale.linear()
+            .domain([1, 2000])
+            .range([250, 2000])
+            .clamp( true );
+
+	var container = document.getElementById('container');
+	var globe = new DAT.Globe(container, {
+		colorFn: colorFn,
+		sizeFn: sizeFn
+	});
 
     
-		d3.tsv("data/01.tsv", function( error, rawData ) {
+	d3.tsv("data/01.tsv", function( error, rawData ) {
 
 			var data = [];
 			rawData.forEach( function( item ) {
@@ -60,8 +77,8 @@ $( document ).ready( function() {
             globe.animate();
             document.body.style.backgroundImage = 'none'; // remove loading
 
-        });
-    }
+    });
+}
 });
 </script>
 </body>

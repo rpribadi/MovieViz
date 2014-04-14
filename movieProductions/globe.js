@@ -11,6 +11,26 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+function relMouseCoords(event){
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = this;
+
+    do{
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+
+    return {x:canvasX, y:canvasY}
+}
+HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
 var DAT = DAT || {};
 
 DAT.Globe = function(container, opts) {
@@ -21,6 +41,8 @@ DAT.Globe = function(container, opts) {
     c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
     return c;
   };
+  
+  var allPoints = new THREE.Object3D();
   
   var sizeFn = opts.sizeFn;
 
@@ -87,6 +109,16 @@ DAT.Globe = function(container, opts) {
   var distance = 100000, distanceTarget = 100000;
   var padding = 40;
   var PI_HALF = Math.PI / 2;
+  var SCREEN_WIDTH;
+  var SCREEN_HEIGHT;
+  var raycaster = new THREE.Raycaster();
+  var projector = new THREE.Projector();
+  var directionVector = new THREE.Vector3();  
+  var clickInfo = {
+    x: 0,
+    y: 0,
+    userHasClicked: false
+  };
 
   function init() {
 
@@ -96,6 +128,9 @@ DAT.Globe = function(container, opts) {
     var shader, uniforms, material;
     w = container.offsetWidth || window.innerWidth;
     h = container.offsetHeight || window.innerHeight;
+    
+    SCREEN_WIDTH = w;
+    SCREEN_HEIGHT = h;
 
     camera = new THREE.PerspectiveCamera(30, w / h, 1, 10000);
     camera.position.z = distance;
@@ -144,6 +179,9 @@ DAT.Globe = function(container, opts) {
 
     point = new THREE.Mesh(geometry);
 
+    point = new THREE.CubeGeometry(0.75, 0.75, 1);
+    point.applyMatrix(new THREE.Matrix4().makeTranslation(0,0,-0.5));
+
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(w, h);
 
@@ -166,6 +204,15 @@ DAT.Globe = function(container, opts) {
     container.addEventListener('mouseout', function() {
       overRenderer = false;
     }, false);
+
+
+    container.addEventListener('mousedown', function (evt) {
+    	clickInfo.userHasClicked = true;
+		clickInfo.x = evt.offsetX;
+		clickInfo.y = evt.offsetY;
+	}, false);    
+
+  
   }
 
   addData = function(data, opts) {
@@ -177,12 +224,10 @@ DAT.Globe = function(container, opts) {
     console.log(opts.format);
     if (opts.format === 'magnitude') {
       step = 3;
-      colorFnWrapper = function(data, i) { 
-    	  console.log(colorFn(data[i+2]), data[i+2]);
-    	  return colorFn(data[i+2]); }
+      colorFnWrapper = function(data, i) { return colorFn(data[i+2]); }
     } else if (opts.format === 'legend') {
       step = 4;
-      colorFnWrapper = function(data, i) { return colorFn(data[i+3]); }
+      colorFnWrapper = function(data, i) { return colorFn(data[i+2]); }
     } else {
       throw('error: format not supported: '+opts.format);
     }
@@ -212,7 +257,13 @@ DAT.Globe = function(container, opts) {
       lng = data[i + 1];
       color = colorFnWrapper(data,i);
       size = sizeFn( data[i + 2] );
-      addPoint(lat, lng, size, color, subgeo);
+      var userData = {
+    		  value: data[ i + 2 ],
+    		  country: data[ i + 3],
+    		  color: color,
+    		  size: size
+      }
+      addPoint(lat, lng, size, color, userData );
     }
     if (opts.animated) {
       this._baseGeometry.morphTargets.push({'name': opts.name, vertices: subgeo.vertices});
@@ -223,13 +274,16 @@ DAT.Globe = function(container, opts) {
   };
 
   function createPoints() {
+	var mesh = undefined;
     if (this._baseGeometry !== undefined) {
       if (this.is_animated === false) {
-        this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
-              color: 0xffffff,
-              vertexColors: THREE.FaceColors,
-              morphTargets: false
-            }));
+//        this.points = new THREE.Mesh(this._baseGeometry, new THREE.MeshBasicMaterial({
+//              color: 0xffffff,
+//              vertexColors: THREE.FaceColors,
+//              morphTargets: false
+//            }));
+
+
       } else {
         if (this._baseGeometry.morphTargets.length < 8) {
           console.log('t l',this._baseGeometry.morphTargets.length);
@@ -246,33 +300,44 @@ DAT.Globe = function(container, opts) {
 //              morphTargets: true
 //            }));
       }
-      scene.add(this.points);
+      scene.add(allPoints);
+//      scene.add(this.points);
     }
   }
 
-  function addPoint(lat, lng, size, color, subgeo) {
+  function addPoint(lat, lng, size, color, userData) {
 
     var phi = (90 - lat) * Math.PI / 180;
     var theta = (180 - lng) * Math.PI / 180;
 
-    point.position.x = 200 * Math.sin(phi) * Math.cos(theta);
-    point.position.y = 200 * Math.cos(phi);
-    point.position.z = 200 * Math.sin(phi) * Math.sin(theta);
+    
+    var material = new THREE.MeshBasicMaterial({
+    	color: color
+    });
+    
+    var theMesh = new THREE.Mesh(point, material);
+    
+    theMesh.position.x = 200 * Math.sin(phi) * Math.cos(theta);
+    theMesh.position.y = 200 * Math.cos(phi);
+    theMesh.position.z = 200 * Math.sin(phi) * Math.sin(theta);
 
-    point.lookAt(mesh.position);
+    theMesh.lookAt(mesh.position);
 
-    point.scale.x = Math.max( 10 ); // avoid non-invertible matrix
-    point.scale.y = Math.max( 10 ); // avoid non-invertible matrix
-    point.scale.z = Math.max( size/10, 0.1 ); // avoid non-invertible matrix
-    point.updateMatrix();
+    theMesh.scale.x = Math.max( 8 ); // avoid non-invertible matrix
+    theMesh.scale.y = Math.max( 8 ); // avoid non-invertible matrix
+    theMesh.scale.z = Math.max( size, 0.1 ); // avoid non-invertible matrix
+    theMesh.updateMatrix();
+    
+    theMesh.userData = userData;
 
-    for (var i = 0; i < point.geometry.faces.length; i++) {
+    allPoints.add(theMesh);
+//    for (var i = 0; i < point.geometry.faces.length; i++) {
+//
+//      point.geometry.faces[i].color = color;
+//
+//    }
 
-      point.geometry.faces[i].color = color;
-
-    }
-
-    THREE.GeometryUtils.merge(subgeo, point);
+//    THREE.GeometryUtils.merge(subgeo, point);
   }
 
   function onMouseDown(event) {
@@ -353,6 +418,78 @@ DAT.Globe = function(container, opts) {
   function animate() {
     requestAnimationFrame(animate);
     render();
+    handlePick();
+  }
+  
+  function handlePick() {
+	  if (clickInfo.userHasClicked) {
+
+		    clickInfo.userHasClicked = false;
+
+		    // The following will translate the mouse coordinates into a number
+		    // ranging from -1 to 1, where
+		    //      x == -1 && y == -1 means top-left, and
+		    //      x ==  1 && y ==  1 means bottom right
+		    var x = ( clickInfo.x / SCREEN_WIDTH ) * 2 - 1;
+		    var y = -( clickInfo.y / SCREEN_HEIGHT ) * 2 + 1;
+
+		    // Now we set our direction vector to those initial values
+		    directionVector.set(x, y, 1);
+
+		    // Unproject the vector
+		    projector.unprojectVector(directionVector, camera);
+
+		    // Substract the vector representing the camera position
+		    directionVector.sub(camera.position);
+
+		    // Normalize the vector, to avoid large numbers from the
+		    // projection and substraction
+		    directionVector.normalize();
+
+		    // Now our direction vector holds the right numbers!
+		    raycaster.set(camera.position, directionVector);
+
+		    // Ask the raycaster for intersects with all objects in the scene:
+		    // (The second arguments means "recursive")
+		    var intersects = raycaster.intersectObjects(allPoints.children, true);
+
+		    if (intersects.length) {
+		      // intersections are, by default, ordered by distance,
+		      // so we only care for the first one. The intersection
+		      // object holds the intersection point, the face that's
+		      // been "hit" by the ray, and the object to which that
+		      // face belongs. We only care for the object itself.
+		      var target = intersects[0].object;
+		      var objectId = $(".infoBox").data("objectId");
+			  if( objectId ) {
+					var mesh = allPoints.getObjectById( objectId );
+					mesh.material.color.setStyle( mesh.userData.color )
+					mesh.scale.x = 8;
+					mesh.scale.y = 8;
+					$(".infoBox").data("objectId", undefined)
+			  }		      
+		      console.log( "TARGET", target.userData, clickInfo )
+		      var text = "<h2>" + target.userData.country + "</h2><p>Total Movie(s): <strong>" + target.userData.value + "</strong></p>";
+		      $(".infoBox").show().html( text ).css("top", clickInfo.y + 5).css("left", clickInfo.x + 10).data("objectId", target.id);
+		      target.material.color.setStyle("#999")
+		      target.scale.x = 10;
+		      target.scale.y = 10;
+		    }
+		    else {
+		    	var objectId = $(".infoBox").hide().data("objectId");
+		    	if( objectId ) {
+		    		var mesh = allPoints.getObjectById( objectId );
+		    		mesh.material.color.setStyle( mesh.userData.color );
+					mesh.scale.x = 8;
+					mesh.scale.y = 8;
+		    		$(".infoBox").data("objectId", undefined)
+		    	}
+		    	else {
+		    		// do nothing
+		    	}
+		    }
+
+		  }	  
   }
 
   function render() {

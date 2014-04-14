@@ -59,7 +59,7 @@
 		var chart = svg.append("g")
 	    	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
-
+		var format = d3.time.format("%d %b %Y");
 		var movieToDates = {};
 		var grossToDates = {};
 		d3.tsv(filename1, function( error, data ) {
@@ -122,7 +122,7 @@
 				   .attr("fill", function(d,i) { return colorScale(d.total); })
 				   .on("mouseover", function( item, i ) {
 					   console.log( item );
-					   var text = "<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + item.total+ "</strong>";
+					   var text = "<h2>" + format( new Date( Date.parse( item.date) ) ) + "</h2>Total Movies: <strong>" + item.total+ "</strong>";
 						   
 					   if( item.date in grossToDates ) {
 						   text += "<br/><br />Top Gross Movie(s): <strong>"+ grossToDates[item.date].movie.length +"</strong><br />" + grossToDates[item.date].movie.join("<br />")
@@ -204,7 +204,7 @@
 									"left": x( new Date( Date.parse(item.date) ) ) + 60,
 									"top": y(80)
 					   		})
-							.html("<strong>" + item.date + "</strong><br /><br />Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />Top Gross Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
+							.html("<h2>" + format( new Date( Date.parse( item.date) ) ) + "</h2>Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />Top Gross Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
 						   
 						   $(element + "-" + item.date).css("stroke", "red").css("stroke-width", 5)
 						   $(element + "-" + item.date).attr("r", 15)

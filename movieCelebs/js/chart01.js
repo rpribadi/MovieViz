@@ -106,14 +106,28 @@
 				   .attr("r", function(d) { return sizeScale(d.total)})
 				   .attr("fill", function(d,i) { return colorScale(d.total); })
 				   .on("mouseover", function( item, i ) {
-					   console.log( item );
+					   function checkImage(src) {
+						     var img = new Image();
+						     img.onload = function() {
+						    	 console.log("EXISTS", src)
+							     $("#chart-01-infobox").prepend(img);
+						     };
+						     img.onerror = function() {
+						    	 console.log("MISSING", src)
+						     };
+
+						     img.src = src; // fires off loading of image
+					   }
+					   
+					   checkImage("img/" + item.name.replace(/ /g, "_") + ".jpg");
+					   
 					   $("#chart-01-infobox").css({
 							   	"display": "auto",
 							   	"visibility": "visible",
 								"left": x(i) + 60,
 								"top": y(item.total)
 					   		})
-							.html("<strong>" + item.name + "</strong><br />Total: " + item.total);
+							.html("<h2>" + item.name + "</h2><p>Total Movie(s): <strong>" + item.total + "</strong></p>");
 					   
 					   $(element + "-" + item.id).css("stroke", "#666").css("stroke-width", 2)
 				   })

@@ -119,7 +119,6 @@
 			   .append("text")
 			   .text(function(d) {
 				   if( d.is_oscar === "1" ) {
-					console.log(d.title, typeof(d.revenue), format(d.revenue / 1000000))
 			   		return "" + format(d.revenue / 1000000);
 				   }
 				   else {

@@ -124,7 +124,62 @@
 				.on("mouseout", function( item, i ) {
 					mouseOut( item, i, "revenue", this );
 				});
+
+			var legend = chart.append("g").attr("class", "legend");
+			var xPos = 350000000;
+
+			legend.append("rect")
+				.attr("class", "budget")
+				.attr("width", y.rangeBand())
+				.attr("height", y.rangeBand())
+				.attr("x", x( xPos ))
+				.attr("y", padding.top + ( 1 * y.rangeBand() ) )
+
+			legend.append("text")
+				.text("Budget")
+				.attr("class", "budget")
+				.attr("x", x( xPos ) + ( 2 * y.rangeBand() ))
+				.attr("y", padding.top + ( 2 * y.rangeBand() ))
+				
+			legend.append("rect")
+				.attr("class", "gross")
+				.attr("width", y.rangeBand())
+				.attr("height", y.rangeBand())
+				.attr("x", x( xPos ))
+				.attr("y", padding.top + ( 3 * y.rangeBand() ) )
+
+			legend.append("text")
+				.text("Gross")
+				.attr("class", "gross")
+				.attr("x", x( xPos ) + ( 2 * y.rangeBand() ))
+				.attr("y", padding.top + ( 4 * y.rangeBand() ))
+				
+			legend.append("rect")
+				.attr("class", "gain")
+				.attr("width", y.rangeBand())
+				.attr("height", y.rangeBand())
+				.attr("x", x( xPos ))
+				.attr("y", padding.top + ( 5 * y.rangeBand() ) )
+				
+			legend.append("text")
+				.text("Profit")
+				.attr("class", "gain")
+				.attr("x", x( xPos ) + ( 2 * y.rangeBand() ))
+				.attr("y", padding.top + ( 6 * y.rangeBand() ))
+				
+			legend.append("rect")
+				.attr("class", "loss")
+				.attr("width", y.rangeBand())
+				.attr("height", y.rangeBand())
+				.attr("x", x( xPos ))
+				.attr("y", padding.top + ( 7 * y.rangeBand() ) )
 			
+			legend.append("text")
+				.text("Loss")
+				.attr("class", "loss")
+				.attr("x", x( xPos ) + ( 2 * y.rangeBand() ))
+				.attr("y", padding.top + ( 8 * y.rangeBand() ))
+				
 		});
 		
 		function mouseOver( item, i, type, target ) {
@@ -171,7 +226,6 @@
 			$(element + "-infobox").css("display", "none");
 			target.setAttribute("stroke", "none")
 		}
-
 	};
 
 	window.Chart08 = Chart08;

@@ -78,7 +78,7 @@
 			  .attr("y", 6)
 			  .attr("dy", ".71em")
 			  .style("text-anchor", "end")
-			  .text("Revenue ($) M");
+			  .text("Revenue (USD)");
 
 			chart.append("g")
 				.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
@@ -119,7 +119,7 @@
 			   .append("text")
 			   .text(function(d) {
 				   if( d.is_oscar === "1" ) {
-			   		return "" + format(d.revenue / 1000000);
+			   		return "" + format(d.revenue / 1000000) +"M";
 				   }
 				   else {
 					   return "";

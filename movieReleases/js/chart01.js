@@ -6,9 +6,9 @@
 		var svg = d3.select(element);
 		var padding = {
 			top: 50,
-			bottom: 50,
-			left: 50,
-			right: 50,
+			bottom: 75,
+			left: 100,
+			right: 50
 		};
 		var width = $( element ).width() - padding.left - padding.right;
 		var height = $( element ).height() - padding.top - padding.bottom;
@@ -28,7 +28,7 @@
 	
 		var xAxis = d3.svg.axis()
 //			.ticks( d3.time.months, 2)
-			.tickFormat(d3.time.format('%b %d'))
+			.tickFormat(d3.time.format('%Y-%m-%d'))
 			.ticks(function() { return [
 			     new Date( Date.parse("2013-01-31") ),
 			     new Date( Date.parse("2013-02-28") ),
@@ -59,7 +59,7 @@
 		var chart = svg.append("g")
 	    	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
-		var format = d3.time.format("%d %b %Y");
+		var format = d3.time.format("%Y-%m-%d");
 		var movieToDates = {};
 		var oscarToDates = {};
 		d3.tsv(filename1, function( error, data ) {
@@ -86,7 +86,7 @@
 				.attr("dy", ".3em")
 
 				.attr("transform", function(d) {
-				    return "rotate(-35)" 
+				    return "rotate(-30)"
 			    });
 
 

@@ -64,7 +64,7 @@
 			  .attr("y", 6)
 			  .attr("dy", ".71em")
 			  .style("text-anchor", "end")
-			  .text("Opening Week Gross ($) M");
+			  .text("Opening Week Gross (USD)");
 
 			chart.append("g")
 				.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
@@ -98,7 +98,7 @@
 			   .enter()
 			   .append("text")
 			   .text(function(d) {
-			   		return format(d.gross/1000000.0);
+			   		return format(d.gross/1000000.0) + "M";
 			   })
 			   .attr("x", function(d) {
 			   		return x(d.title);

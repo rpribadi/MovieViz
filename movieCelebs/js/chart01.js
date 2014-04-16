@@ -75,6 +75,10 @@
 					.style("text-anchor", "end")
 					.text("Celeb");
 
+            chart.select("g.x.axis")
+                .selectAll("g.tick")
+                .attr("style", "opacity: 0;")
+
 			chart.append("g")
 			  .attr("class", "y axis")
 			  .call(yAxis)
@@ -83,7 +87,7 @@
 			  .attr("y", 6)
 			  .attr("dy", ".71em")
 			  .style("text-anchor", "end")
-			  .text("Total");
+			  .text("Total Movies");
 
 			var barWidth = width/data.length;
 		    //Create circles

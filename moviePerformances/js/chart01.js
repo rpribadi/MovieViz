@@ -64,7 +64,7 @@
 			  .attr("y", 6)
 			  .attr("dy", ".71em")
 			  .style("text-anchor", "end")
-			  .text("Budget");
+			  .text("Budget (USD)");
 
 			chart.append("g")
 				.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")
@@ -89,7 +89,7 @@
 				   })
 				   .attr("r", 2);
 
-			var format = d3.format("$,")
+			var format = d3.format(",")
 			//Create labels
 			chart.append("g")
 				.attr("transform", "translate(" + x.rangeBand()/2 + ",0)")

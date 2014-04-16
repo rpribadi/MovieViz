@@ -7,8 +7,8 @@
 		var padding = {
 			top: 30,
 			bottom: 50,
-			left: 250,
-			right: 50,
+			left: 300,
+			right: 50
 		};
 
 		var width = $( element ).width() - padding.left - padding.right;
@@ -43,7 +43,7 @@
 				minMax = minMax.concat([ item.budget, item.gross, item.revenue ]);
 			});
 
-			x.domain( [ -250000000, 450000000 ] );
+			x.domain( [ -250000000, 425000000 ] );
 			y.domain( data.map( function(d) { return d.title; } ) );
 
 		    yAxis.ticks( data.length );
@@ -51,13 +51,25 @@
 			chart.append("g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")")
-				.call(xAxis);
+				.call(xAxis)
+                .append("text")
+                    .attr("y", -20)
+                    .attr("x", width)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Amount (USD)");
 
 
 			chart.append("g")
-			  .attr("class", "y axis")
-			  .call(yAxis);
-			
+			    .attr("class", "y axis")
+			    .call(yAxis)
+                .append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Movies");
+
 			chart.append("g")
 				.attr("class", "budget")
 				.selectAll("rect")

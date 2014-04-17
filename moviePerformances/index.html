@@ -175,8 +175,10 @@ LIMIT 100
                 oscar budget vs gross vs revenue  
             </p>
 <pre>
-
-
+SELECT title, budget_usd, latest_gross_usd, ( latest_gross_usd - budget_usd ) AS revenue
+FROM movie
+WHERE id IN ( SELECT DISTINCT(movie_id) FROM oscar_movie_award )
+ORDER BY title ASC
 </pre>
             <div style='position: relative;'>
             <div id='chart-08-infobox' class='infobox'></div>

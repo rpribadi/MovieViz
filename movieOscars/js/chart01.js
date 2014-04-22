@@ -139,6 +139,7 @@
 						.attr("d", line)
 						.attr("id", valueKey + "-" + data[ key ][0].id)
 						.style("stroke", colorScale( key ) )
+						.style("stroke-width", "2" )
 						.on("mouseover", function( item ) { 
 							mouseover(item[0].id, item)
 

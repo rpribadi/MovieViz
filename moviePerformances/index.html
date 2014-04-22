@@ -47,9 +47,48 @@
     </style>
 </head>
 <body>
-    <a href='../index.html'>Back to Index</a>
-    <h1>Movie Performances</h1>
+    <h1>Movie Budget / Profit (Loss)</h1>
     <ol>
+
+        <li>
+            <p>
+                oscar movies budget / profit (loss) analysis  
+            </p>
+<pre>
+SELECT title, budget_usd, latest_gross_usd, ( latest_gross_usd - budget_usd ) AS revenue
+FROM movie
+WHERE id IN ( SELECT DISTINCT(movie_id) FROM oscar_movie_award )
+ORDER BY title ASC
+</pre>
+            <div style='position: relative;'>
+            <div id='chart-08-infobox' class='infobox'></div>
+            <svg id='chart-08'></svg>
+            </div>
+        </li>
+        <li>
+            <p>
+                oscar nominees revenue in global top 100 
+            </p>
+<pre>
+SELECT 
+    title, 
+    (latest_gross_usd - budget_usd) AS revenue, 
+    (
+        CASE 
+            WHEN id IN (
+                SELECT DISTINCT(movie_id) FROM oscar_movie_award
+            ) 
+            THEN 1 ELSE 0
+        END
+    ) AS is_oscar
+FROM movie
+WHERE latest_gross_usd IS NOT NULL 
+ORDER BY revenue DESC
+LIMIT 100
+</pre>
+            <svg id='chart-07'></svg>
+        </li>
+
         <li>
             <p>
                 oscar nominees budget
@@ -147,48 +186,15 @@ LIMIT 100
 </pre>
             <svg id='chart-06'></svg>
         </li>
-        <li>
-            <p>
-                oscar nominees revenue in global top 100 
-            </p>
-<pre>
-SELECT 
-    title, 
-    (latest_gross_usd - budget_usd) AS revenue, 
-    (
-        CASE 
-            WHEN id IN (
-                SELECT DISTINCT(movie_id) FROM oscar_movie_award
-            ) 
-            THEN 1 ELSE 0
-        END
-    ) AS is_oscar
-FROM movie
-WHERE latest_gross_usd IS NOT NULL 
-ORDER BY revenue DESC
-LIMIT 100
-</pre>
-            <svg id='chart-07'></svg>
-        </li>
-        <li>
-            <p>
-                oscar budget vs gross vs revenue  
-            </p>
-<pre>
-SELECT title, budget_usd, latest_gross_usd, ( latest_gross_usd - budget_usd ) AS revenue
-FROM movie
-WHERE id IN ( SELECT DISTINCT(movie_id) FROM oscar_movie_award )
-ORDER BY title ASC
-</pre>
-            <div style='position: relative;'>
-            <div id='chart-08-infobox' class='infobox'></div>
-            <svg id='chart-08'></svg>
-            </div>
-        </li>
+
     <ol>
     
+    <script>
+        var activeMenu = "performance"; 
+    </script>
     <script src='../libs/d3.min.js'></script>
     <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='../libs/menu.js'></script>
     <script src='js/chart01.js'></script>
     <script src='js/chart02.js'></script>
     <script src='js/chart03.js'></script>

@@ -44,12 +44,11 @@
     </style>
 </head>
 <body>
-    <a href='../index.html'>Back to Index</a>
     <h1>Movie Celebs</h1>
     <ol>
         <li>
             <p>
-                Celeb movie per year
+                Celeb movie appearance in a year
             </p>
 <pre>
 SELECT actor_id, COUNT(actor_id) AS total
@@ -64,8 +63,12 @@ ORDER BY celeb.name DESC
         </li>
     <ol>
     
+    <script>
+        var activeMenu = "celeb"; 
+    </script>
     <script src='../libs/d3.min.js'></script>
     <script src='../libs/jquery-2.1.0.min.js'></script>
+    <script src='../libs/menu.js'></script>
     <script src='js/chart01.js'></script>
 
     <script>

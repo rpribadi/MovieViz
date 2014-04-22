@@ -130,8 +130,8 @@
 					   $(element + "-infobox").css({
 							   	"display": "auto",
 							   	"visibility": "visible",
-								"left": x( new Date( Date.parse(item.date) ) ) + 60,
-								"top": y(item.total)
+								"left": x( new Date( Date.parse(item.date) ) ) + padding.left + 15,
+								"top": padding.top + y(item.total)
 				   		})
 						.html(text);
 					   
@@ -201,7 +201,7 @@
 						   $(element + "-infobox").css({
 								   	"display": "auto",
 								   	"visibility": "visible",
-									"left": x( new Date( Date.parse(item.date) ) ) + 60,
+									"left": x( new Date( Date.parse(item.date) ) ) + padding.left + 10,
 									"top": y(80)
 					   		})
 							.html("<h2>" + format( new Date( Date.parse( item.date) ) ) + "</h2>Total Movies: <strong>" + movieToDates[ item.date ]+ "</strong><br/><br />OSCAR Movie(s): <strong>"+ item.movie.length +"</strong><br />" + item.movie.join("<br />"));
